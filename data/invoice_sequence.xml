@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_invoice" model="ir.sequence">
+        <field name="name">Invoice Sequence</field>
+        <field name="code">hospital1.invoice</field>
+        <field name="prefix">INV</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+    </record>
+</odoo>

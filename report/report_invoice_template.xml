@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="report_invoice_template">
+
+    <t t-call="web.basic_layout">
+      <t t-foreach="docs" t-as="doc">
+        <div class="page">
+          <h2 style="text-align: center;">Facture</h2>
+          <p>
+            <strong>Nom du patient :</strong><t t-esc="doc.patient_id.name"/></p>
+          <p><strong>Médecin :</strong> <t t-esc="doc.doctor_id.name"/></p>
+          <p><strong>Date de Facture :</strong> <t t-esc="doc.date_invoice"/></p>
+          <p><strong>Date d'Échéance :</strong> <t t-esc="doc.date_due"/></p>
+          <hr/>
+          <h3>Lignes de facture :</h3>
+          <ul>
+            <!-- -->
+            <t t-foreach="doc.invoice_line_ids" t-as="line">
+              <li>
+                <t t-esc="line.description"/> —
+                <t t-esc="line.quantity"/> ×
+                <t t-esc="line.unit_price"/> =
+                <t t-esc="line.subtotal"/>
+              </li>
+            </t>
+          </ul>
+          <hr/>
+          <p><strong>Total HT :</strong> <t t-esc="doc.subtotal"/></p>
+          <p><strong>Taxe :</strong> <t t-esc="doc.tax_amount"/></p>
+          <p><strong>Total TTC :</strong> <t t-esc="doc.total_amount"/></p>
+          <p><strong>Méthode de paiement :</strong> <t t-esc="doc.payment_method"/></p>
+          <p><strong>État :</strong> <t t-esc="doc.state"/></p>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

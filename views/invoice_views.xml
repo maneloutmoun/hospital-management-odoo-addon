@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Vue formulaire des factures -->
+    <!-- un identifiant unique -->
+    <record id="view_hospital_invoice_form" model="ir.ui.view">
+        <!-- nom technique -->
+        <field name="name">hospital1.invoice.form</field>
+        <!--  modele concerne -->
+        <field name="model">hospital1.invoice</field>
+        <!-- structure -->
+        <field name="arch" type="xml">
+            <!-- nom qui sera affiche en haut -->
+            <form string="Invoice">
+
+                <header>
+                    <!-- nom du boutton refere a la methode concernee definie ailleurs-->
+                    <button name="%(hospital1.action_report_invoice)d"
+        string="Imprimer la Facture"
+        type="action"
+        class="btn-primary"/>
+                  <!--  <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                            <button nae="action confirm me " string =me
+                    <button name="action_cancel" string="Cancel" type="object"
+                            class="btn-secondary" invisible="state in ['paid', 'cancelled']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancelled'"/>     -->
+                   <!-- barre de progression du champs state -->
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+ <!-- appelle la methode ecrite dans name , avce les droits dacces du groupe et il saffiche selon si letat est concerne etc -->
+                    <button name="action_request_confirmation" type="object"
+            string="Demander confirmation"
+          groups="hospital1.group_accountant"
+            class="btn-primary"
+            modifiers='{"invisible": [["state", "!=", "draft"]]}'/>
+
+        <button name="action_confirm_invoice" type="object"
+            string="Confirmer facture"
+                groups="hospital1.group_doctor"
+            class="btn-success"
+            modifiers='{"invisible": [["state", "!=", "waiting"]]}'
+        />
+
+                <button name="action_mark_paid"
+                        string="Mark as Paid"
+                        type="object"
+                            class="btn-success"
+                        invisible="state != 'confirmed'"/>
+                </header>
+                <!-- contenu du formulaire  corps de formulaire -->
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <!-- laffichage des champs +condition si letat est different de draft il est modifiable-->
+                            <field name="patient_id" readonly="state != 'draft'"/>
+                            <field name="doctor_id" readonly="state != 'draft'"/>
+                            <field name="date_invoice" readonly="state != 'draft'"/>
+                            <field name="date_due" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="payment_method"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Invoice Lines">
+
+                            <field name="invoice_line_ids" readonly="state != 'draft'">
+                                <!-- vue liste des lignes de la facture -->
+                                <tree string="Invoice Lines" editable="bottom">
+
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="subtotal"/>
+
+                                </tree>
+                            </field>
+                            <!-- affichages des champs restants -->
+                            <group class="oe_subtotal_footer oe_right">
+
+                                <field name="subtotal" widget="monetary"/>
+                                <field name="tax_amount" widget="monetary"/>
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="total_amount"/>
+                                    <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <!-- emails = historique et chat interne -->
+                    <field name="message_ids" widget="mail_thread"/>
+
+                </sheet>
+                <!-- chatter pour les trucs trackable = historique des modifications des champs suivis-->
+                 <div class="oe_chatter">
+            </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste des factures  donc record cest le separateur -->
+    <!-- and id is the name were gonna call it with -->
+    <record id="view_hospital_invoice_tree" model="ir.ui.view">
+        <field name="name">hospital1.invoice.tree</field>
+        <field name="model">hospital1.invoice</field>
+        <field name="arch" type="xml">
+            <tree string="Invoices" decoration-success="state=='paid'" decoration-info="state=='confirmed'" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="date_invoice"/>
+                <field name="date_due"/>
+                <field name="total_amount" widget="monetary"/>
+                <field name="state" widget="badge" decoration-success="state=='paid'" decoration-info="state=='confirmed'" decoration-warning="state=='draft'" decoration-danger="state=='cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue recherche des factures -->
+    <record id="view_hospital_invoice_search" model="ir.ui.view">
+        <field name="name">hospital1.invoice.search</field>
+        <field name="model">hospital1.invoice</field>
+        <field name="arch" type="xml">
+            <search string="Search Invoices">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                <separator/>
+                <filter string="This Month" name="this_month" domain="[('date_invoice', '>=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Patient" name="group_patient" domain="[]" context="{'group_by': 'patient_id'}"/>
+                    <filter string="Doctor" name="group_doctor" domain="[]" context="{'group_by': 'doctor_id'}"/>
+                    <filter string="Status" name="group_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action des factures -->
+    <!-- identifiant unique pour appeler ce xml dans le menu en desous -->
+    <record id="action_hospital_invoice" model="ir.actions.act_window">
+      <!-- nom de laction saffiche dans le titre de la fenetre-->
+        <field name="name">Invoices</field>
+<!-- module concernee-->
+        <field name="res_model">hospital1.invoice</field>
+        <!-- les vues disponibles pour cette action , lordre affecte-->
+        <field name="view_mode">tree,form</field>
+<!-- contexte par defaut-->
+        <field name="context">{'search_default_this_month': 1}</field>
+<!-- message daide si ya aucune facture -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first invoice!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <!-- creation dun sous menu appele illing affiche dans le menu principal du module et un sous menu qui declenche laction qui ouvre les vues -->
+    <menuitem id="menu_hospital_billing" name="Billing" parent="menu_hospital1_root" sequence="30"/>
+    <!--appelle celui qui est dans action definer et ce dernier appelle form tree etc -->
+    <menuitem id="menu_hospital_invoices" name="Invoices" parent="menu_hospital_billing" action="action_hospital_invoice"  sequence="10"/>
+</odoo>

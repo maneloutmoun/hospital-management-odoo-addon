@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hospital1_doctor,hospital1.doctor,model_hospital1_doctor,,1,1,1,1
+access_hospital1_patient,hospital1.patient,model_hospital1_patient,,1,1,1,1
+access_hospital1_invoice,hospital1.invoice,model_hospital1_invoice,,1,1,1,1
+access_hospital1_invoice_line,hospital1.invoice.line,model_hospital1_invoice_line,,1,1,1,1
+access_invoice_doctor,hospital1.invoice doctor,model_hospital1_invoice,hospital1.group_doctor,1,1,1,0
+access_invoice_accountant,hospital1.invoice accountant,model_hospital1_invoice,hospital1.group_accountant,1,1,1,1

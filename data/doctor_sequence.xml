@@ -1,0 +1,10 @@
+<!-- creation dun compteur automatiquee pour les docteurs-->
+<odoo>
+    <record id="seq_doctor" model="ir.sequence">
+        <field name="name">Doctor Sequence</field>
+        <field name="code">hospital1.doctor</field>
+        <field name="prefix">DOC</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+    </record>
+</odoo>

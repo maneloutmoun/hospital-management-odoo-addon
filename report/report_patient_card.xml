@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="report_patient_card">
+    <t t-call="web.basic_layout">
+      <t t-foreach="docs" t-as="doc">
+        <div class="page">
+          <h2>Patient Card</h2>
+          <p><strong>Name:</strong> <t t-esc="doc.name"/></p>
+          <p><strong>Reference:</strong> <t t-esc="doc.ref"/></p>
+          <p><strong>Age:</strong> <t t-esc="doc.age"/></p>
+          <p><strong>Gender:</strong> <t t-esc="doc.gender"/></p>
+          <p><strong>Date of Birth:</strong> <t t-esc="doc.date_of_birth"/></p>
+          <p><strong>Doctor:</strong> <t t-esc="doc.doctor_id.name"/></p>
+          <p><strong>Notes:</strong> <t t-esc="doc.note"/></p>
+        </div>
+      </t>
+    </t>
+  </template>
+</odoo>
